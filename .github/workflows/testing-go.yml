@@ -1,0 +1,30 @@
+on:
+  workflow_call:
+    inputs:
+      go_version:
+        description: 'The Go version to download (if necessary) and use.'
+        required: true
+      test_flags:
+        description: 'The test binary also accepts flags that control execution of the test.'
+        required: false
+      go_path:
+        description: 'Testing the packages named by the paths.'
+        required: false
+
+jobs:
+  golang:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/setup-go@268d8c0ca0432bb2cf416faae41297df9d262d7f #v3.3.0
+        with:
+          go-version: '${{ inputs.go_version }}'
+
+      - name: 'Checkout Repo'
+        uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b #v3.0.2
+
+      - name: 'Go Lint'
+        uses: golangci/golangci-lint-action@537aa1903e5d359d0b27dbc19ddd22c5087f3fbc #v3.2.0
+
+      - name: Test with the Go CLI
+        run: go test ${{ inputs.test_flags }} ${{ inputs.go_path }} 
