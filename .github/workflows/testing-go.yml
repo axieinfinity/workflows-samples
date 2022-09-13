@@ -4,12 +4,15 @@ on:
       go_version:
         description: 'The Go version to download (if necessary) and use.'
         required: true
+        type: string
       test_flags:
         description: 'The test binary also accepts flags that control execution of the test.'
         required: false
+        type: string
       go_path:
         description: 'Testing the packages named by the paths.'
         required: false
+        type: string
 
 jobs:
   golang:
