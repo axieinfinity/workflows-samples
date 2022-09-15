@@ -21,6 +21,7 @@ jobs:
 
       - name: 'Install Libaries'
         run: yarn install
-
+      - name: 'Compile'
+        run: yarn compile
       - name: 'Run Test'
         run: yarn test
