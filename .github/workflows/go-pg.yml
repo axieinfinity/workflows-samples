@@ -1,0 +1,85 @@
+on:
+  workflow_call:
+    inputs:
+      go_version:
+        description: 'The Go version to download (if necessary) and use.'
+        required: true
+        type: string
+      test_flags:
+        description: 'The test binary also accepts flags that control execution of the test.'
+        required: false
+        type: string
+      go_path:
+        description: 'Testing the packages named by the paths.'
+        required: false
+        type: string
+      golint_version:
+        description: 'Testing the packages named by the paths.'
+        required: false
+        type: string
+        default: 'latest'
+      golint_args:
+        description: 'Testing the packages named by the paths.'
+        required: false
+        type: string
+      postgres_host:
+        description: 'Postgres Host'
+        default: 'postgres'
+        required: false
+        type: string
+      postgres_port:
+        description: 'Postgres Port'
+        default: 5432
+        required: false
+        type: number
+      postgres_user:
+        description: 'Postgres Username'
+        default: 'postgres'
+        required: false
+        type: string
+      postgres_pass:
+        description: 'Postgres Password'
+        default: '123'
+        required: false
+        type: string
+      postgres_db:
+        description: 'Postgres DB'
+        default: 'test'
+        required: false
+        type: string
+
+jobs:
+  golang:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:14
+        ports:
+        - 5432:5432
+        env:
+          POSTGRES_USER: '${{ inputs.postgres_user }}'
+          POSTGRES_PASSWORD: '${{ inputs.postgres_pass }}'
+          POSTGRES_DB: '${{ inputs.postgres_db }}'
+    steps:
+      - name: 'Setup Go'
+        uses: actions/setup-go@268d8c0ca0432bb2cf416faae41297df9d262d7f #v3.3.0
+        with:
+          go-version: '${{ inputs.go_version }}'
+
+      - name: 'Checkout Repo'
+        uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b #v3.0.2
+
+      - name: 'Go Lint'
+        uses: golangci/golangci-lint-action@537aa1903e5d359d0b27dbc19ddd22c5087f3fbc #v3.2.0
+        with:
+          version: '${{ inputs.golint_version }}'
+          args: ${{ inputs.golint_args }}
+
+      - name: 'Test with the Go CLI'
+        run: go test ${{ inputs.test_flags }} ${{ inputs.go_path }}
+        env:
+          POSTGRES_HOST: '${{ inputs.postgres_host }}'
+          POSTGRES_PORT: '${{ inputs.postgres_port }}'
+          POSTGRES_USERNAME: '${{ inputs.postgres_user }}'
+          POSTGRES_PASSWORD: '${{ inputs.postgres_pass }}'
+
