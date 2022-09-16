@@ -79,7 +79,7 @@ jobs:
         run: go test ${{ inputs.test_flags }} ${{ inputs.go_path }}
         env:
           POSTGRES_HOST: '${{ inputs.postgres_host }}'
-          POSTGRES_PORT: '${{ inputs.postgres_port }}'
+          POSTGRES_PORT: ${{ inputs.postgres_port }}
           POSTGRES_USERNAME: '${{ inputs.postgres_user }}'
           POSTGRES_PASSWORD: '${{ inputs.postgres_pass }}'
 
