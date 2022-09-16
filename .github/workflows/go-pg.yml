@@ -22,6 +22,11 @@ on:
         description: 'Testing the packages named by the paths.'
         required: false
         type: string
+      postgres_image:
+        description: 'Postgres Image'
+        default: 'postgres:14'
+        required: false
+        type: string
       postgres_host:
         description: 'Postgres Host'
         default: 'postgres'
@@ -53,7 +58,7 @@ jobs:
     runs-on: ubuntu-latest
     services:
       postgres:
-        image: postgres:14
+        image: ${{ inputs.postgres_image }}
         ports:
         - 5432:5432
         env:
