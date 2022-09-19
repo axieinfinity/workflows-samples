@@ -8,13 +8,6 @@ on:
         required: false
         type: string
         default: 'Dockerfile'
-    secrets:
-      workload_identity_provider:
-        required: true
-        type: string
-      service_account:
-        required: true
-        type: string
 
 jobs:
   build:
@@ -47,8 +40,8 @@ jobs:
         uses: google-github-actions/auth@dac4e13deb3640f22e3ffe758fd3f95e6e89f712 #v0.8.1
         with:
           token_format: 'access_token'
-          workload_identity_provider: ${{ secrets.workload_identity_provider }}
-          service_account: ${{ secrets.service_account }}
+          workload_identity_provider: ${{ secrets.GH_ACTIONS_WIP }}
+          service_account: ${{ secrets.GH_ACTIONS_SA_GCR }}
 
       - name: 'Login to GCR'
         uses: docker/login-action@49ed152c8eca782a232dede0303416e8f356c37b #v2.0.0
@@ -64,5 +57,5 @@ jobs:
           file: ${{ inputs.dockerfile_path }}
           push: true
           tags: ${{ steps.meta.outputs.tags }}
-          cache-from: type=registry,ref=${{ inputs.image_repository }}/cache:buildcache
-          cache-to: type=registry,ref=${{ inputs.image_repository }}/cache:buildcache,mode=max
+          cache-from: type=registry,ref=${{ inputs.image_repository }}:buildcache
+          cache-to: type=registry,ref=${{ inputs.image_repository }}:buildcache,mode=max
