@@ -1,0 +1,76 @@
+on:
+  workflow_call:
+    inputs:
+      image_repository:
+        required: true
+        type: string
+      dockerfile_path:
+        required: false
+        type: string
+        default: 'Dockerfile'
+      checkout_repository:
+        required: false
+        type: string
+      checkout_submodules:
+        required: false
+        type: string
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+
+    steps:
+      - name: 'Get Token'
+        id: gh-app
+        uses: getsentry/action-github-app-token@38a3ce582e170ddfe8789f509597c6944f2292a9 #v1.0.6
+        with:
+          app_id: ${{ secrets.GH_APP_ID }}
+          private_key: ${{ secrets.GH_PRIVATE_KEY }}
+
+      - name: 'Checkout Repo With Submodule'
+        uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b #v3.0.2
+        with:
+          repository: ${{ inputs.checkout_repository }}
+          token: ${{ steps.gh-app.outputs.token }}
+          submodules: ${{ inputs.checkout_submodules }}
+
+      - id: 'meta'
+        name: 'Docker Meta'
+        uses: docker/metadata-action@69f6fc9d46f2f8bf0d5491e4aabe0bb8c6a4678a #v4.0.1
+        with:
+          images: ${{ inputs.image_repository }}
+          tags: |
+            type=ref,suffix=-{{sha}},event=branch
+            type=ref,suffix=-{{sha}},event=pr
+            type=semver,event=tag,pattern={{raw}}
+
+      # Enable Registry Cache
+      - name: 'Set up Docker Buildx'
+        uses: docker/setup-buildx-action@dc7b9719a96d48369863986a06765841d7ea23f6 #v2.0.0
+
+      - id: 'auth'
+        name: 'Authenticate to Google Cloud'
+        uses: google-github-actions/auth@dac4e13deb3640f22e3ffe758fd3f95e6e89f712 #v0.8.1
+        with:
+          token_format: 'access_token'
+          workload_identity_provider: ${{ secrets.GH_ACTIONS_WIP }}
+          service_account: ${{ secrets.GH_ACTIONS_SA_GCR }}
+
+      - name: 'Login to GCR'
+        uses: docker/login-action@49ed152c8eca782a232dede0303416e8f356c37b #v2.0.0
+        with:
+          registry: gcr.io
+          username: oauth2accesstoken
+          password: ${{ steps.auth.outputs.access_token }}
+
+      - name: 'Build and Push'
+        uses: docker/build-push-action@c84f38281176d4c9cdb1626ffafcd6b3911b5d94 #v3.1.1
+        with:
+          context: .
+          file: ${{ inputs.dockerfile_path }}
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
