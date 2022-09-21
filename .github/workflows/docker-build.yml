@@ -57,5 +57,5 @@ jobs:
           file: ${{ inputs.dockerfile_path }}
           push: true
           tags: ${{ steps.meta.outputs.tags }}
-          cache-from: type=registry,ref=${{ inputs.image_repository }}:buildcache
-          cache-to: type=registry,ref=${{ inputs.image_repository }}:buildcache,mode=max
+          # cache-from: type=registry,ref=${{ inputs.image_repository }}:buildcache
+          # cache-to: type=registry,ref=${{ inputs.image_repository }}:buildcache,mode=max
