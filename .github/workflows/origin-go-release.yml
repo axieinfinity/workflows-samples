@@ -1,0 +1,54 @@
+on:
+  workflow_call:
+    inputs:
+      go_version:
+        description: 'The Go version to download (if necessary) and use.'
+        required: true
+        type: string
+      go_check_latest:
+        description: 'The Go version to download (if necessary) and use.'
+        required: false
+        type: string
+      go_cache:
+        description: 'The Go version to download (if necessary) and use.'
+        required: false
+        type: string
+
+jobs:
+  golang:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        goos: [linux, darwin]
+        goarch: [amd64, arm64]
+
+    steps:
+      - id: 'gh-app'
+        name: 'Get Token'
+        uses: getsentry/action-github-app-token@38a3ce582e170ddfe8789f509597c6944f2292a9 #v1.0.6
+        with:
+          app_id: ${{ secrets.GH_APP_ID }}
+          private_key: ${{ secrets.GH_PRIVATE_KEY }}
+
+      - name: 'Checkout Repo'
+        uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b #v3.0.2
+
+      - name: 'Setup Go'
+        uses: actions/setup-go@268d8c0ca0432bb2cf416faae41297df9d262d7f #v3.3.0
+        with:
+          go-version: '${{ inputs.go_version }}'
+          check-latest: '${{ inputs.go_check_latest }}'
+          cache: '${{ inputs.go_cache }}'
+
+      - name: 'Go Build'
+        run: |
+          git config --global url."https://x-access-token:${{ steps.gh-app.outputs.token }}@github.com".insteadOf "https://github.com"
+          GOOS=${{ matrix.goos }} GOARCH=${{ matrix.goarch }} go build -o origin-scripting-${{ matrix.goos }}_${{ matrix.goarch }}
+
+      - name: 'Release'
+        uses: softprops/action-gh-release@1e07f4398721186383de40550babbdf2b84acfc5 #v0.1.14
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: |
+            origin-scripting-${{ matrix.goos }}_${{ matrix.goarch }}
