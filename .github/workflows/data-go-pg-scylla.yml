@@ -57,7 +57,26 @@ on:
         default: 'scylladb/scylla:5.2'
         required: false
         type: string
-
+      scylla_hosts:
+        description: 'Scylla Hosts'
+        default: 'scylla:9042'
+        required: false
+        type: string
+      scylla_keyspace:
+        description: 'Scylla Keyspace'
+        default: 'test'
+        required: false
+        type: string
+      scylla_user:
+        description: 'Scylla Username'
+        default: ''
+        required: false
+        type: string
+      scylla_pass:
+        description: 'Scylla Password'
+        default: ''
+        required: false
+        type: string
 
 jobs:
   golang:
@@ -98,4 +117,8 @@ jobs:
           POSTGRES_PORT: ${{ inputs.postgres_port }}
           POSTGRES_USERNAME: '${{ inputs.postgres_user }}'
           POSTGRES_PASSWORD: '${{ inputs.postgres_pass }}'
+          SCYLLA_HOSTS: '${{ inputs.scylla_hosts }}'
+          SCYLLA_USERNAME: '${{ inputs.scylla_user }}'
+          SCYLLA_PASSWORD: '${{ inputs.scylla_pass }}'
+          SCYLLA_KEYSPACE: '${{ inputs.scylla_keyspace }}'
 
