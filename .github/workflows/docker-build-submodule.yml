@@ -74,3 +74,5 @@ jobs:
           file: ${{ inputs.dockerfile_path }}
           push: true
           tags: ${{ steps.meta.outputs.tags }}
+          secrets: |
+            "github_token=${{ steps.gh-app.outputs.token }}"
