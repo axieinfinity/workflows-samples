@@ -52,6 +52,12 @@ on:
         default: 'test'
         required: false
         type: string
+      scylla_image:
+        description: 'ScyllaDB Image'
+        default: 'scylladb/scylla:5.2'
+        required: false
+        type: string
+
 
 jobs:
   golang:
@@ -66,6 +72,10 @@ jobs:
           POSTGRES_USER: '${{ inputs.postgres_user }}'
           POSTGRES_PASSWORD: '${{ inputs.postgres_pass }}'
           POSTGRES_DB: '${{ inputs.postgres_db }}'
+      scylla:
+        image: ${{ inputs.scylla_image }}
+        ports:
+        - 9042:9042
     steps:
       - name: 'Setup Go'
         uses: actions/setup-go@268d8c0ca0432bb2cf416faae41297df9d262d7f #v3.3.0
