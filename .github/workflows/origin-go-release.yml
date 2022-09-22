@@ -48,7 +48,7 @@ jobs:
 
       - name: 'Release'
         uses: softprops/action-gh-release@1e07f4398721186383de40550babbdf2b84acfc5 #v0.1.14
-        if: startsWith(github.ref, 'refs/tags/')
+        # if: startsWith(github.ref, 'refs/tags/')
         with:
           files: |
             origin-scripting-${{ matrix.goos }}_${{ matrix.goarch }}
