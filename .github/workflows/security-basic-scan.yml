@@ -1,0 +1,43 @@
+on:
+  workflow_call:
+    inputs:
+      semgrep_options:
+        required: false
+        type: string
+        default: '--config auto --exclude Dockerfile'
+
+jobs:
+  semgrep:
+    runs-on: ubuntu-latest
+
+    container:
+      # A Docker image with Semgrep installed. Do not change this.
+      image: returntocorp/semgrep
+
+    # Skip any PR created by dependabot to avoid permission issues:
+    if: (github.actor != 'dependabot[bot]')
+
+    steps:
+
+      - name: 'Checkout Repo'
+        uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b #v3.0.2
+
+      - name: 'Static analysis'
+        run: semgrep ci ${{ inputs.semgrep_options }}
+
+  TruffleHog:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 'Checkout Repo'
+        uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b #v3.0.2
+        with:
+          fetch-depth: 0
+
+      - name: 'TruffleHog OSS'
+        uses: trufflesecurity/trufflehog@e8f1bb9127dce852df2115560444d63ed3fe3f83 #v3.12.0
+        with:
+          path: ./
+          base: ${{ github.event.repository.default_branch }}
+          head: HEAD
+          extra_args: --debug --only-verified
