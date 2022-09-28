@@ -59,3 +59,5 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           # cache-from: type=registry,ref=${{ inputs.image_repository }}:buildcache
           # cache-to: type=registry,ref=${{ inputs.image_repository }}:buildcache,mode=max
+          secrets: |
+            "github_token=${{ secrets.GITHUB_TOKEN }}"
