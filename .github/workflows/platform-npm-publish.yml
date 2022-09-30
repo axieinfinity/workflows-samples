@@ -34,6 +34,11 @@ jobs:
           node-version: '${{ inputs.node_version }}'
           registry-url: '${{ inputs.registry_url }}'
 
+      - name: 'Install dependencies'
+        run: yarn install
+        env:
+          NPM_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: 'Publish packages'
         run: npm publish
         working-directory: '${{ inputs.working_directory }}'
