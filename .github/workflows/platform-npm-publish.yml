@@ -37,10 +37,10 @@ jobs:
       - name: 'Install dependencies'
         run: yarn install
         env:
-          NPM_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: 'Publish packages'
         run: npm publish
         working-directory: '${{ inputs.working_directory }}'
         env:
-          NPM_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
