@@ -1,0 +1,46 @@
+on:
+  workflow_call:
+    inputs:
+      node_version:
+        description: 'The Node version to download (if necessary) and use.'
+        required: false
+        type: string
+        default: 'latest'
+      registry_url:
+        description: 'Optional registry to set up for auth. Will set the registry in a project level .npmrc and .yarnrc file, and set up auth to read in from env.NODE_AUTH_TOKEN.'
+        required: false
+        type: string
+      working_directory:
+        description: 'The working directory of where to run the command.'
+        required: false
+        type: string
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+
+      - name: 'Checkout Repo'
+        uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b #v3.0.2
+
+      - name: 'Setup Node'
+        uses: actions/setup-node@2fddd8803e2f5c9604345a0b591c3020ee971a93 #v3.4.1
+        with:
+          node-version: '${{ inputs.node_version }}'
+          registry-url: '${{ inputs.registry_url }}'
+
+      - name: 'Install dependencies'
+        run: yarn install
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 'Publish packages'
+        run: npm publish
+        working-directory: '${{ inputs.working_directory }}'
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
