@@ -10,6 +10,10 @@ on:
         description: 'Optional registry to set up for auth. Will set the registry in a project level .npmrc and .yarnrc file, and set up auth to read in from env.NODE_AUTH_TOKEN.'
         required: false
         type: string
+      scope:
+        description: 'Optional scope for authenticating against scoped registries.'
+        required: false
+        type: string
       working_directory:
         description: 'The working directory of where to run the command.'
         required: false
@@ -33,11 +37,12 @@ jobs:
         with:
           node-version: '${{ inputs.node_version }}'
           registry-url: '${{ inputs.registry_url }}'
+          scope: '${{ inputs.scope }}'
 
       - name: 'Install dependencies'
         run: yarn install
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
 
       - name: 'Publish packages'
         run: npm publish
