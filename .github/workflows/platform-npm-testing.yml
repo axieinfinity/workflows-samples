@@ -16,7 +16,7 @@ on:
         type: string
 
 jobs:
-  publish:
+  npm:
     runs-on: ubuntu-latest
 
     steps:
