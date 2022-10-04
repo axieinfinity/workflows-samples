@@ -60,4 +60,4 @@ jobs:
           # cache-from: type=registry,ref=${{ inputs.image_repository }}:buildcache
           # cache-to: type=registry,ref=${{ inputs.image_repository }}:buildcache,mode=max
           secrets: |
-            "npm_token=${{ secrets.NPM_TOKEN }}"
+            "npm_token=${{ secrets.NPM_AUTH_TOKEN }}"
