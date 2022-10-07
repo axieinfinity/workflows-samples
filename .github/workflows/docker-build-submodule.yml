@@ -14,6 +14,10 @@ on:
       checkout_submodules:
         required: false
         type: string
+      build_context:
+        required: false
+        type: string
+        default: '.'
 
 jobs:
   build:
@@ -70,7 +74,7 @@ jobs:
       - name: 'Build and Push'
         uses: docker/build-push-action@c84f38281176d4c9cdb1626ffafcd6b3911b5d94 #v3.1.1
         with:
-          context: .
+          context: ${{ inputs.build_context }}
           file: ${{ inputs.dockerfile_path }}
           push: true
           tags: ${{ steps.meta.outputs.tags }}
