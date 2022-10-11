@@ -44,11 +44,13 @@ jobs:
       - name: 'Go Build'
         run: |
           git config --global url."https://x-access-token:${{ steps.gh-app.outputs.token }}@github.com".insteadOf "https://github.com"
-          GOOS=${{ matrix.goos }} GOARCH=${{ matrix.goarch }} go build -o "${GITHUB_REPOSITORY#*/}"-${{ matrix.goos }}_${{ matrix.goarch }}
+          GOOS=${{ matrix.goos }} GOARCH=${{ matrix.goarch }} go build -o "${GITHUB_REPOSITORY#*/}".${{ matrix.goos }}_${{ matrix.goarch }}
+          sha256sum "${GITHUB_REPOSITORY#*/}.${{ matrix.goos }}_${{ matrix.goarch }} > "${GITHUB_REPOSITORY#*/}".${{ matrix.goos }}_${{ matrix.goarch }}.sha256sum.txt
 
       - name: 'Release'
         uses: softprops/action-gh-release@1e07f4398721186383de40550babbdf2b84acfc5 #v0.1.14
         if: startsWith(github.ref, 'refs/tags/')
         with:
           files: |
-            origin-scripting-${{ matrix.goos }}_${{ matrix.goarch }}
+            "${GITHUB_REPOSITORY#*/}".${{ matrix.goos }}_${{ matrix.goarch }}
+            "${GITHUB_REPOSITORY#*/}".${{ matrix.goos }}_${{ matrix.goarch }}.sha256sum.txt
