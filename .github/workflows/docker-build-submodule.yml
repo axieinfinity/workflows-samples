@@ -18,6 +18,10 @@ on:
         required: false
         type: string
         default: '.'
+      build_args:
+        required: false
+        type: string
+        default: ''
 
 jobs:
   build:
@@ -75,6 +79,7 @@ jobs:
       - name: 'Build and Push'
         uses: docker/build-push-action@c84f38281176d4c9cdb1626ffafcd6b3911b5d94 #v3.1.1
         with:
+          build-args: ${{ inputs.build_args }}
           context: ${{ inputs.build_context }}
           file: ${{ inputs.dockerfile_path }}
           push: true
