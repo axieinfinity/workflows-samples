@@ -1,0 +1,173 @@
+on:
+  workflow_call:
+    inputs:
+      checkout_submodules:
+        required: false
+        type: string
+      rust_profile:
+        description: 'Execute rustup set profile {value} before installing the toolchain, ex. minimal'
+        required: false
+        type: string
+        default: 'minimal'
+      rust_toolchain:
+        description: 'Toolchain name to use, ex. stable, nightly.'
+        required: false
+        type: string
+        default: 'stable'
+      rust_components:
+        description: 'Comma-separated list of the additional components to install, ex. clippy, rustfmt.'
+        required: false
+        type: string
+      build_options:
+        description: 'Comma-separated list of the additional components to install, ex. clippy, rustfmt.'
+        required: false
+        type: string
+      ansible_repository:
+        description: 'Repository ansible with owner.'
+        required: false
+        type: string
+      ansible_repository_ref:
+        description: 'The branch, tag or SHA to checkout.'
+        required: false
+        type: string
+        default: 'main'
+      ansible_repository_path:
+        description: 'Relative path under $GITHUB_WORKSPACE to place the repository.'
+        required: true
+        type: string
+      ansible_config:
+        description: 'Comma-separated list of the additional components to install, ex. clippy, rustfmt.'
+        required: false
+        type: string
+      ansible_ssh_executable:
+        description: 'Comma-separated list of the additional components to install, ex. clippy, rustfmt.'
+        required: false
+        type: string
+      ansible_scp_executable:
+        description: 'Comma-separated list of the additional components to install, ex. clippy, rustfmt.'
+        required: false
+        type: string
+      ansible_playbook:
+        description: 'Ansible playbook filepath.'
+        required: true
+        type: string
+      ansible_requirements:
+        description: 'Ansible Galaxy requirements filepath.'
+        required: false
+        type: string
+      ansible_options:
+        description: 'Extra options that should be passed to ansible-playbook command'
+        required: false
+        type: string
+      working_directory:
+        description: 'directory path'
+        required: true
+        type: string
+      environment:
+        description: 'To describe a general deployment target'
+        required: true
+        type: string
+
+jobs:
+  build-and-deploy:
+
+    runs-on: ubuntu-latest
+
+    environment:
+      name: ${{ inputs.environment }}
+
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+
+    steps:
+      - id: 'gh-app'
+        name: 'Get Token'
+        uses: 'getsentry/action-github-app-token@38a3ce582e170ddfe8789f509597c6944f2292a9' #v1.0.6
+        with:
+          app_id: ${{ secrets.GH_APP_ID }}
+          private_key: ${{ secrets.GH_PRIVATE_KEY }}
+
+      - name: 'Checkout Repo'
+        uses: 'actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8' #v3.1.0
+        with:
+          token: ${{ steps.gh-app.outputs.token }}
+          submodules: ${{ inputs.checkout_submodules }}
+
+      - name: 'Checkout Repo Ansible'
+        uses: 'actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b' #v3.0.2
+        with:
+          repository: ${{ inputs.ansible_repository }}
+          ref: ${{ inputs.ansible_repository_ref }}
+          path: ${{ inputs.ansible_repository_path }}
+          token: ${{ steps.gh-app.outputs.token }}
+
+      # - name: 'Cache Cargo'
+      #   uses: 'actions/cache@56461b9eb0f8438fd15c7a9968e3c9ebb18ceff1' #v3.0.10
+      #   with:
+      #     path: |
+      #       ~/.cargo/bin/
+      #       ~/.cargo/registry/index/
+      #       ~/.cargo/registry/cache/
+      #       ~/.cargo/git/db/
+      #       target/
+      #     key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+
+      # - name: 'Setup Rust'
+      #   uses: 'actions-rs/toolchain@b2417cde72dcf67f306c0ae8e0828a81bf0b189f' #v1.0.7
+      #   with:
+      #     profile: '${{ inputs.rust_profile }}' 
+      #     toolchain: '${{ inputs.rust_toolchain }}'
+      #     components: '${{ inputs.rust_components }}'
+
+      # - name: 'Git Config'
+      #   run: |
+      #     git config --global url."https://x-access-token:${{ steps.gh-app.outputs.token }}@github.com".insteadOf "https://github.com"
+
+      # - name: 'Rust Build'
+      #   run: cargo build --release ${{ inputs.build_options }}
+      #   env:
+      #     CARGO_NET_GIT_FETCH_WITH_CLI: true
+
+      - name: 'Cache Python'
+        uses: 'actions/cache@56461b9eb0f8438fd15c7a9968e3c9ebb18ceff1' #v3.0.10
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: 'Setup Python'
+        uses: 'actions/setup-python@13ae5bb136fac2878aff31522b9efb785519f984' #v4.3.0
+        with:
+          python-version: '3.9'
+
+      - name: 'Configure SSH'
+        run: |
+          pip install -r ${{ inputs.working_directory }}/requirements.txt
+          mkdir -p ~/.ssh
+
+      - id: 'auth'
+        name: 'Authenticate to Google Cloud'
+        uses: 'google-github-actions/auth@dac4e13deb3640f22e3ffe758fd3f95e6e89f712' #v0.8.1
+        with:
+          workload_identity_provider: ${{ secrets.GH_ACTIONS_WIP }}
+          service_account: ${{ secrets.GH_ACTIONS_SA_ANSIBLE }}
+
+      - name: 'Set up Cloud SDK'
+        uses: 'google-github-actions/setup-gcloud@ee9693ff89cdf73862b8a13988f6a71070e8fc58' #v0.6.2
+
+      - name: 'Run Ansible playbook'
+        uses: 'dawidd6/action-ansible-playbook@009b88e9b8894bd8838475d799b7dca5024e91d5' #v2.6.0
+        env:
+          ANSIBLE_CONFIG: ${{ inputs.working_directory }}/ansible.cfg
+          ANSIBLE_SSH_EXECUTABLE: ${{ inputs.working_directory }}/misc/gcp-ssh-wrapper.sh
+          ANSIBLE_SCP_EXECUTABLE: ${{ inputs.working_directory }}/misc/gcp-scp-wrapper.sh
+          CLOUDSDK_PYTHON_SITEPACKAGES: 1
+        with:
+          playbook: ${{ inputs.working_directory }}/${{ inputs.ansible_playbook }}
+          requirements: ${{ inputs.working_directory }}/requirements.yml
+          vault_password: ${{secrets.VAULT_PASSWORD}}
+          sudo: true
+          options: |
+            ${{ inputs.ansible_options }}
