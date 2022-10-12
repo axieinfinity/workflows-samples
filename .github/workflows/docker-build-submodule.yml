@@ -50,6 +50,7 @@ jobs:
           tags: |
             type=ref,suffix=-{{sha}},event=branch
             type=ref,suffix=-{{sha}},event=pr
+            type=ref,suffix=-{{sha}},event=tag
             type=semver,event=tag,pattern={{raw}}
 
       # Enable Registry Cache
