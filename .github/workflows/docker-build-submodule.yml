@@ -66,7 +66,7 @@ jobs:
           service_account: ${{ secrets.GH_ACTIONS_SA_GCR }}
 
       - name: 'Login to GCR'
-        uses: docker/login-action@49ed152c8eca782a232dede0303416e8f356c37b #v2.0.0
+        uses: docker/login-action@f4ef78c080cd8ba55a85445d5b36e214a81df20a #v2.0.0
         with:
           registry: gcr.io
           username: oauth2accesstoken
