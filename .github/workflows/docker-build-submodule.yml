@@ -44,7 +44,7 @@ jobs:
 
       - id: 'meta'
         name: 'Docker Meta'
-        uses: docker/metadata-action@69f6fc9d46f2f8bf0d5491e4aabe0bb8c6a4678a #v4.0.1
+        uses: docker/metadata-action@12cce9efe0d49980455aaaca9b071c0befcdd702 #v4.0.1
         with:
           images: ${{ inputs.image_repository }}
           tags: |
