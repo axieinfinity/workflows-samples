@@ -1,0 +1,65 @@
+on:
+  workflow_call:
+    inputs:
+      java_version:
+        description: 'The Java version to set up. Takes a whole or semver Java version.'
+        required: true
+        type: string
+      checkout_repository:
+        description: 'Repository name with owner.'
+        required: false
+        type: string
+      java_distribution:
+        description: 'Java distribution: temurin, zulu, microsoft, corretto'
+        required: false
+        type: string
+        default: 'temurin'
+      mvn_options:
+        description: 'usage: mvn [options] [<goal(s)>] [<phase(s)>]'
+        required: false
+        type: string
+
+jobs:
+  java:
+    runs-on: ubuntu-latest
+    steps:
+      - id: 'gh-app'
+        name: 'Get Token'
+        uses: getsentry/action-github-app-token@38a3ce582e170ddfe8789f509597c6944f2292a9 #v1.0.6
+        with:
+          app_id: ${{ secrets.GH_APP_ID }}
+          private_key: ${{ secrets.GH_PRIVATE_KEY }}
+
+      - name: 'Checkout Repo'
+        uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 #v3.1.0
+        with:
+          repository: ${{ inputs.checkout_repository }}
+          token: ${{ steps.gh-app.outputs.token }}
+
+      - name: 'Cache local Maven repository'
+        uses: actions/cache@9b0c1fce7a93df8e3bb8926b0d6e9d89e92f20a7 #v3.0.11
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+
+      - name: 'Set up JDK'
+        uses: actions/setup-java@a18c333f3f14249953dab3e186e5e21bf3390f1d
+        with:
+          distribution: '${{ inputs.java_distribution }}'
+          java-version: '${{ inputs.java_version }}'
+
+      - name: 'Build with Maven'
+        run: mvn clean verify ${{ inputs.mvn_options }} -Denvironment=${{ inputs.environment }}
+        continue-on-error: true
+
+      - name: Tar files
+        run: tar -cvf report-${{ inputs.environment }}.tar report
+
+      - name: 'Upload Artifact'
+        uses: actions/upload-artifact@3cea5372237819ed00197afe530f5a7ea3e805c8 #v3.1.0
+        with:
+          name: report-${{ inputs.environment }}
+          path: report-${{ inputs.environment }}.tar
+          retention-days: 10
