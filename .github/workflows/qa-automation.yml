@@ -3,8 +3,9 @@ on:
     inputs:
       java_version:
         description: 'The Java version to set up. Takes a whole or semver Java version.'
-        required: true
+        required: false
         type: string
+        default: '18'
       checkout_repository:
         description: 'Repository name with owner.'
         required: false
