@@ -161,14 +161,15 @@ jobs:
       - name: 'Run Ansible playbook'
         uses: 'dawidd6/action-ansible-playbook@009b88e9b8894bd8838475d799b7dca5024e91d5' #v2.6.0
         env:
-          ANSIBLE_CONFIG: ${{ inputs.working_directory }}/ansible.cfg
-          ANSIBLE_SSH_EXECUTABLE: ${{ inputs.working_directory }}/misc/gcp-ssh-wrapper.sh
-          ANSIBLE_SCP_EXECUTABLE: ${{ inputs.working_directory }}/misc/gcp-scp-wrapper.sh
+          # ANSIBLE_CONFIG: ${{ inputs.working_directory }}/ansible.cfg
+          # ANSIBLE_SSH_EXECUTABLE: ${{ inputs.working_directory }}/misc/gcp-ssh-wrapper.sh
+          # ANSIBLE_SCP_EXECUTABLE: ${{ inputs.working_directory }}/misc/gcp-scp-wrapper.sh
           CLOUDSDK_PYTHON_SITEPACKAGES: 1
         with:
-          playbook: ${{ inputs.working_directory }}/${{ inputs.ansible_playbook }}
-          requirements: ${{ inputs.working_directory }}/requirements.yml
+          playbook: ${{ inputs.ansible_playbook }}
+          requirements: requirements.yml
           vault_password: ${{secrets.VAULT_PASSWORD}}
           sudo: true
           options: |
             ${{ inputs.ansible_options }}
+        working-directory: ${{ inputs.working_directory }}
