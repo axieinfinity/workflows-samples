@@ -14,6 +14,17 @@ on:
         description: "Optional scope for authenticating against scoped registries."
         required: false
         type: string
+      pnpm_version:
+        description: "Optional pnpm version"
+        required: false
+        type: string
+        default: "7.12.2"
+
+      bun_version:
+        description: "Optional bun version"
+        required: false
+        type: string
+        default: "latest"
 
 jobs:
   npm:
@@ -25,11 +36,11 @@ jobs:
 
       - uses: pnpm/action-setup@c3b53f6a16e57305370b4ae5a540c2077a1d50dd #2.2.4
         with:
-          version: 7.12.2
+          version: ${{ inputs.pnpm_version }}
 
       - uses: xhyrom/setup-bun@0ec953ee6d7a21c8bcefd4afe696a83930d8bb63 #0.1.7
         with:
-          bun-version: latest
+          bun-version: ${{ inputs.bun_version }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: "Install dependencies"
