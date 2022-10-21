@@ -102,32 +102,32 @@ jobs:
           path: ${{ inputs.ansible_repository_path }}
           token: ${{ steps.gh-app.outputs.token }}
 
-      # - name: 'Cache Cargo'
-      #   uses: 'actions/cache@9b0c1fce7a93df8e3bb8926b0d6e9d89e92f20a7' #v3.0.11
-      #   with:
-      #     path: |
-      #       ~/.cargo/bin/
-      #       ~/.cargo/registry/index/
-      #       ~/.cargo/registry/cache/
-      #       ~/.cargo/git/db/
-      #       target/
-      #     key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+      - name: 'Cache Cargo'
+        uses: 'actions/cache@9b0c1fce7a93df8e3bb8926b0d6e9d89e92f20a7' #v3.0.11
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
 
-      # - name: 'Setup Rust'
-      #   uses: 'actions-rs/toolchain@b2417cde72dcf67f306c0ae8e0828a81bf0b189f' #v1.0.7
-      #   with:
-      #     profile: '${{ inputs.rust_profile }}' 
-      #     toolchain: '${{ inputs.rust_toolchain }}'
-      #     components: '${{ inputs.rust_components }}'
+      - name: 'Setup Rust'
+        uses: 'actions-rs/toolchain@b2417cde72dcf67f306c0ae8e0828a81bf0b189f' #v1.0.7
+        with:
+          profile: '${{ inputs.rust_profile }}' 
+          toolchain: '${{ inputs.rust_toolchain }}'
+          components: '${{ inputs.rust_components }}'
 
-      # - name: 'Git Config'
-      #   run: |
-      #     git config --global url."https://x-access-token:${{ steps.gh-app.outputs.token }}@github.com".insteadOf "https://github.com"
+      - name: 'Git Config'
+        run: |
+          git config --global url."https://x-access-token:${{ steps.gh-app.outputs.token }}@github.com".insteadOf "https://github.com"
 
-      # - name: 'Rust Build'
-      #   run: cargo build --release ${{ inputs.build_options }}
-      #   env:
-      #     CARGO_NET_GIT_FETCH_WITH_CLI: true
+      - name: 'Rust Build'
+        run: cargo build --release ${{ inputs.build_options }}
+        env:
+          CARGO_NET_GIT_FETCH_WITH_CLI: true
 
       - name: 'Cache Python'
         uses: 'actions/cache@9b0c1fce7a93df8e3bb8926b0d6e9d89e92f20a7' #v3.0.11
@@ -161,9 +161,6 @@ jobs:
       - name: 'Run Ansible playbook'
         uses: 'dawidd6/action-ansible-playbook@009b88e9b8894bd8838475d799b7dca5024e91d5' #v2.6.0
         env:
-          # ANSIBLE_CONFIG: ${{ inputs.working_directory }}/ansible.cfg
-          # ANSIBLE_SSH_EXECUTABLE: ${{ inputs.working_directory }}/misc/gcp-ssh-wrapper.sh
-          # ANSIBLE_SCP_EXECUTABLE: ${{ inputs.working_directory }}/misc/gcp-scp-wrapper.sh
           CLOUDSDK_PYTHON_SITEPACKAGES: 1
         with:
           playbook: ${{ inputs.ansible_playbook }}
