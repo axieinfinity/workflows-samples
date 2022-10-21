@@ -169,7 +169,7 @@ jobs:
           playbook: ${{ inputs.ansible_playbook }}
           requirements: requirements.yml
           vault_password: ${{secrets.VAULT_PASSWORD}}
+          directory: ${{ inputs.working_directory }}
           sudo: true
           options: |
             ${{ inputs.ansible_options }}
-        working-directory: ${{ inputs.working_directory }}
