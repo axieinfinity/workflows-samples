@@ -1,19 +1,6 @@
 on:
   workflow_call:
     inputs:
-      node_version:
-        description: "The Node version to download (if necessary) and use."
-        required: false
-        type: string
-        default: "latest"
-      registry_url:
-        description: "Optional registry to set up for auth. Will set the registry in a project level .npmrc and .yarnrc file, and set up auth to read in from env.NODE_AUTH_TOKEN."
-        required: false
-        type: string
-      scope:
-        description: "Optional scope for authenticating against scoped registries."
-        required: false
-        type: string
       pnpm_version:
         description: "Optional pnpm version"
         required: false
