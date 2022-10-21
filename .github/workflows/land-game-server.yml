@@ -83,7 +83,7 @@ jobs:
     steps:
       - id: 'gh-app'
         name: 'Get Token'
-        uses: 'getsentry/action-github-app-token@38a3ce582e170ddfe8789f509597c6944f2292a9' #v1.0.6
+        uses: 'tibdex/github-app-token@021a2405c7f990db57f5eae5397423dcc554159c' #v1.7.0
         with:
           app_id: ${{ secrets.GH_APP_ID }}
           private_key: ${{ secrets.GH_PRIVATE_KEY }}
@@ -95,7 +95,7 @@ jobs:
           submodules: ${{ inputs.checkout_submodules }}
 
       - name: 'Checkout Repo Ansible'
-        uses: 'actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b' #v3.0.2
+        uses: 'actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8' #v3.1.0
         with:
           repository: ${{ inputs.ansible_repository }}
           ref: ${{ inputs.ansible_repository_ref }}
@@ -103,7 +103,7 @@ jobs:
           token: ${{ steps.gh-app.outputs.token }}
 
       # - name: 'Cache Cargo'
-      #   uses: 'actions/cache@56461b9eb0f8438fd15c7a9968e3c9ebb18ceff1' #v3.0.10
+      #   uses: 'actions/cache@9b0c1fce7a93df8e3bb8926b0d6e9d89e92f20a7' #v3.0.11
       #   with:
       #     path: |
       #       ~/.cargo/bin/
@@ -130,7 +130,7 @@ jobs:
       #     CARGO_NET_GIT_FETCH_WITH_CLI: true
 
       - name: 'Cache Python'
-        uses: 'actions/cache@56461b9eb0f8438fd15c7a9968e3c9ebb18ceff1' #v3.0.10
+        uses: 'actions/cache@9b0c1fce7a93df8e3bb8926b0d6e9d89e92f20a7' #v3.0.11
         with:
           path: ~/.cache/pip
           key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
@@ -144,12 +144,13 @@ jobs:
 
       - name: 'Configure SSH'
         run: |
-          pip install -r ${{ inputs.working_directory }}/requirements.txt
+          pip install -r requirements.txt
           mkdir -p ~/.ssh
+        working-directory: ${{ inputs.working_directory }}
 
       - id: 'auth'
         name: 'Authenticate to Google Cloud'
-        uses: 'google-github-actions/auth@dac4e13deb3640f22e3ffe758fd3f95e6e89f712' #v0.8.1
+        uses: 'google-github-actions/auth@c4799db9111fba4461e9f9da8732e5057b394f72' #v0.8.3
         with:
           workload_identity_provider: ${{ secrets.GH_ACTIONS_WIP }}
           service_account: ${{ secrets.GH_ACTIONS_SA_ANSIBLE }}
