@@ -26,13 +26,13 @@ jobs:
     steps:
       - id: 'gh-app'
         name: 'Get Token'
-        uses: getsentry/action-github-app-token@38a3ce582e170ddfe8789f509597c6944f2292a9 #v1.0.6
+        uses: 'tibdex/github-app-token@021a2405c7f990db57f5eae5397423dcc554159c' #v1.7.0
         with:
           app_id: ${{ secrets.GH_APP_ID }}
           private_key: ${{ secrets.GH_PRIVATE_KEY }}
 
       - name: 'Checkout Repo'
-        uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 #v3.0.2
+        uses: 'actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8' #v3.1.0
 
       - name: 'Setup Go'
         uses: actions/setup-go@268d8c0ca0432bb2cf416faae41297df9d262d7f #v3.3.0

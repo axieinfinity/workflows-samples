@@ -26,19 +26,19 @@ jobs:
     steps:
       - id: 'gh-app'
         name: 'Get Token'
-        uses: getsentry/action-github-app-token@38a3ce582e170ddfe8789f509597c6944f2292a9 #v1.0.6
+        uses: 'tibdex/github-app-token@021a2405c7f990db57f5eae5397423dcc554159c' #v1.7.0
         with:
           app_id: ${{ secrets.GH_APP_ID }}
           private_key: ${{ secrets.GH_PRIVATE_KEY }}
 
       - name: 'Checkout Repo'
-        uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 #v3.1.0
+        uses: 'actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8' #v3.1.0
         with:
           repository: ${{ inputs.checkout_repository }}
           token: ${{ steps.gh-app.outputs.token }}
 
       - name: 'Cache local Maven repository'
-        uses: actions/cache@9b0c1fce7a93df8e3bb8926b0d6e9d89e92f20a7 #v3.0.11
+        uses: 'actions/cache@9b0c1fce7a93df8e3bb8926b0d6e9d89e92f20a7' #v3.0.11
         with:
           path: ~/.m2/repository
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
@@ -46,7 +46,7 @@ jobs:
             ${{ runner.os }}-maven-
 
       - name: 'Set up JDK'
-        uses: actions/setup-java@a18c333f3f14249953dab3e186e5e21bf3390f1d
+        uses: 'actions/setup-java@de1bb2b0c5634f0fc4438d7aa9944e68f9bf86cc'
         with:
           distribution: '${{ inputs.java_distribution }}'
           java-version: '${{ inputs.java_version }}'
@@ -59,7 +59,7 @@ jobs:
         run: tar -cvf report-${{ inputs.environment }}.tar report
 
       - name: 'Upload Artifact'
-        uses: actions/upload-artifact@3cea5372237819ed00197afe530f5a7ea3e805c8 #v3.1.0
+        uses: 'actions/upload-artifact@3cea5372237819ed00197afe530f5a7ea3e805c8' #v3.1.0
         with:
           name: report-${{ inputs.environment }}
           path: report-${{ inputs.environment }}.tar
