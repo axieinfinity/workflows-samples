@@ -22,6 +22,11 @@ on:
         description: 'Comma-separated list of the additional components to install, ex. clippy, rustfmt.'
         required: false
         type: string
+      python_version:
+        description: 'The python-version input supports the Semantic Versioning Specification'
+        required: false
+        type: string
+        default: '3.9'
       ansible_repository:
         description: 'Repository ansible with owner.'
         required: false
@@ -140,7 +145,7 @@ jobs:
       - name: 'Setup Python'
         uses: 'actions/setup-python@13ae5bb136fac2878aff31522b9efb785519f984' #v4.3.0
         with:
-          python-version: '3.9'
+          python-version: '${{ inputs.python_version }}'
 
       - name: 'Configure SSH'
         run: |
