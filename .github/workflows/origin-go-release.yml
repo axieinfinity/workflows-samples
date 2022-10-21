@@ -2,15 +2,15 @@ on:
   workflow_call:
     inputs:
       go_version:
-        description: 'The Go version to download (if necessary) and use.'
+        description: "The Go version to download (if necessary) and use."
         required: true
         type: string
       go_check_latest:
-        description: 'The action first checks if the cached version is the latest one.'
+        description: "The action first checks if the cached version is the latest one."
         required: false
         type: string
       go_cache:
-        description: 'Caching and restoring go modules and build outputs.'
+        description: "Caching and restoring go modules and build outputs."
         required: false
         type: string
 
@@ -24,33 +24,33 @@ jobs:
         goarch: [amd64, arm64]
 
     steps:
-      - id: 'gh-app'
-        name: 'Get Token'
-        uses: 'tibdex/github-app-token@021a2405c7f990db57f5eae5397423dcc554159c' #v1.7.0
+      - id: "gh-app"
+        name: "Get Token"
+        uses: "tibdex/github-app-token@021a2405c7f990db57f5eae5397423dcc554159c" #v1.7.0
         with:
           app_id: ${{ secrets.GH_APP_ID }}
           private_key: ${{ secrets.GH_PRIVATE_KEY }}
 
-      - name: 'Checkout Repo'
-        uses: 'actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8' #v3.1.0
+      - name: "Checkout Repo"
+        uses: "actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8" #v3.1.0
 
-      - name: 'Setup Go'
+      - name: "Setup Go"
         uses: actions/setup-go@268d8c0ca0432bb2cf416faae41297df9d262d7f #v3.3.0
         with:
-          go-version: '${{ inputs.go_version }}'
-          check-latest: '${{ inputs.go_check_latest }}'
-          cache: '${{ inputs.go_cache }}'
+          go-version: "${{ inputs.go_version }}"
+          check-latest: "${{ inputs.go_check_latest }}"
+          cache: "${{ inputs.go_cache }}"
 
-      - name: 'Get Repository Name'
+      - name: "Get Repository Name"
         run: echo "REPOSITORY_NAME=${GITHUB_REPOSITORY#*/}" >> $GITHUB_ENV
 
-      - name: 'Go Build'
+      - name: "Go Build"
         run: |
           git config --global url."https://x-access-token:${{ steps.gh-app.outputs.token }}@github.com".insteadOf "https://github.com"
           GOOS=${{ matrix.goos }} GOARCH=${{ matrix.goarch }} go build -o ${{ env.REPOSITORY_NAME }}-${{ matrix.goos }}_${{ matrix.goarch }}
           sha256sum ${{ env.REPOSITORY_NAME }}-${{ matrix.goos }}_${{ matrix.goarch }} > ${{ env.REPOSITORY_NAME }}-${{ matrix.goos }}_${{ matrix.goarch }}.sha256sum.txt
 
-      - name: 'Release'
+      - name: "Release"
         uses: softprops/action-gh-release@1e07f4398721186383de40550babbdf2b84acfc5 #v0.1.14
         if: startsWith(github.ref, 'refs/tags/')
         with:
