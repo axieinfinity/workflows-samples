@@ -164,7 +164,7 @@ jobs:
         uses: 'google-github-actions/setup-gcloud@ee9693ff89cdf73862b8a13988f6a71070e8fc58' #v0.6.2
 
       - name: 'Run Ansible playbook'
-        uses: 'dawidd6/action-ansible-playbook@009b88e9b8894bd8838475d799b7dca5024e91d5' #v2.6.0
+        uses: 'dawidd6/action-ansible-playbook@5d970176ea4bfd99a3f5004d48e293fe0994eda1' #v2.6.1
         env:
           CLOUDSDK_PYTHON_SITEPACKAGES: 1
         with:
