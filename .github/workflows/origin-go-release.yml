@@ -17,7 +17,7 @@ on:
         description: 'directory path'
         required: true
         type: string
-        default: ""
+        default: "."
 
 jobs:
   golang:
@@ -61,5 +61,5 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/')
         with:
           files: |
-            ${{ env.REPOSITORY_NAME }}-${{ matrix.goos }}_${{ matrix.goarch }}
-            ${{ env.REPOSITORY_NAME }}-${{ matrix.goos }}_${{ matrix.goarch }}.sha256sum.txt
+            ${{ inputs.working_directory }}/${{ env.REPOSITORY_NAME }}-${{ matrix.goos }}_${{ matrix.goarch }}
+            ${{ inputs.working_directory }}/${{ env.REPOSITORY_NAME }}-${{ matrix.goos }}_${{ matrix.goarch }}.sha256sum.txt
