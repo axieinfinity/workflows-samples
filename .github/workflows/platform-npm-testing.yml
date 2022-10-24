@@ -13,6 +13,23 @@ on:
         type: string
         default: "latest"
 
+      node_version:
+        description: "The Node version to download (if necessary) and use."
+        required: false
+        type: string
+        default: "latest"
+
+      registry_url:
+        description: "Optional registry to set up for auth. Will set the registry in a project level .npmrc and .yarnrc file, and set up auth to read in from env.NODE_AUTH_TOKEN."
+        required: false
+        type: string
+        default: "https://npm.pkg.github.com"
+
+      scope:
+        description: "Optional scope for authenticating against scoped registries."
+        required: false
+        type: string
+        default: "@axieinfinity"
 jobs:
   npm:
     runs-on: ubuntu-latest
@@ -29,6 +46,34 @@ jobs:
         with:
           bun-version: ${{ inputs.bun_version }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: "Setup Node"
+        uses: actions/setup-node@8c91899e586c5b171469028077307d293428b516 #v3.4.1
+        with:
+          node-version: "${{ inputs.node_version }}"
+          registry-url: "${{ inputs.registry_url }}"
+          scope: "${{ inputs.scope }}"
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@cd2af74528f644555073f1e24557b269d7e03a8d #v2
+        id: pnpm-install
+        with:
+          version: ${{ inputs.pnpm_version }}
+          run_install: false
+
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+
+      - name: Setup pnpm cache
+        uses: actions/cache@v3
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
 
       - name: "Install dependencies"
         run: pnpm install
