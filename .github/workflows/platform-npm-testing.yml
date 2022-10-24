@@ -28,7 +28,7 @@ on:
         description: "Optional scope for authenticating against scoped registries."
         required: false
         type: string
-jobs
+jobs:
   npm:
     runs-on: ubuntu-latest
 
