@@ -14,42 +14,6 @@ jobs:
       - name: Base
         uses: axieinfinity/workflows-samples/.github/workflows/platform-npm-base.yml
 
-      - name: "Setup Node"
-        uses: actions/setup-node@8c91899e586c5b171469028077307d293428b516 #v3.4.1
-        with:
-          node-version: "${{ inputs.node_version }}"
-          registry-url: "${{ inputs.registry_url }}"
-          scope: "${{ inputs.scope }}"
-
-      - name: 'Setup Bun runtime'
-        uses: antongolub/action-setup-bun@fe3087e075d89bcc411b5e20b95aacbdac8acef4 #v1.12
-
-      - name: Install pnpm
-        uses: pnpm/action-setup@cd2af74528f644555073f1e24557b269d7e03a8d #v2
-        id: pnpm-install
-        with:
-          version: ${{ inputs.pnpm_version }}
-          run_install: false
-
-      - name: Get pnpm store directory
-        id: pnpm-cache
-        shell: bash
-        run: |
-          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
-
-      - name: Setup pnpm cache
-        uses: actions/cache@v3
-        with:
-          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-
-
-      - name: "Install dependencies"
-        run: pnpm install
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
-
       - name: Create Release Pull Request
         id: changesets
         uses: changesets/action@v1
