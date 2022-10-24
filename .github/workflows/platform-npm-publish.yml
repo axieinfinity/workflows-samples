@@ -13,6 +13,9 @@ jobs:
     steps:
       - name: Base
         uses: axieinfinity/workflows-samples/.github/workflows/platform-npm-base.yml
+        with:
+          registry_url: 'https://npm.pkg.github.com'
+          scope: '@axieinfinity'
 
       - name: Create Release Pull Request
         id: changesets
