@@ -31,11 +31,6 @@ on:
         type: string
         default: "@axieinfinity"
 
-      base_ref:
-        description: "Optional scope for authenticating against scoped registries."
-        required: false
-        type: string
-        default: 'main'
 jobs:
   npm:
     runs-on: ubuntu-latest
