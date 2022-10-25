@@ -37,7 +37,7 @@ on:
         type: string
         default: 'main'
 jobs:
-  setup-runtime:
+  npm:
     runs-on: ubuntu-latest
     steps:
       - name: "Checkout Repo"
