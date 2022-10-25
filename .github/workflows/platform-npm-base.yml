@@ -1,0 +1,104 @@
+on:
+  workflow_call:
+    inputs:
+      pnpm_version:
+        description: "Optional pnpm version"
+        required: false
+        type: string
+        default: "7.12.2"
+
+      bun_version:
+        description: "Optional bun version"
+        required: false
+        type: string
+        default: "latest"
+
+      node_version:
+        description: "The Node version to download (if necessary) and use."
+        required: false
+        type: string
+        default: "latest"
+
+      registry_url:
+        description: "Optional registry to set up for auth. Will set the registry in a project level .npmrc and .yarnrc file, and set up auth to read in from env.NODE_AUTH_TOKEN."
+        required: false
+        type: string
+
+      scope:
+        description: "Optional scope for authenticating against scoped registries."
+        required: false
+        type: string
+
+jobs:
+  npm:
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Checkout Repo"
+        uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 #v3.0.2
+
+      - uses: pnpm/action-setup@c3b53f6a16e57305370b4ae5a540c2077a1d50dd #2.2.4
+        with:
+          version: ${{ inputs.pnpm_version }}
+
+      - name: 'Setup Bun runtime'
+        uses: antongolub/action-setup-bun@fe3087e075d89bcc411b5e20b95aacbdac8acef4 #v1.12
+        with:
+          bun-version: ${{ inputs.bun_version }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: "Setup Node runtime"
+        uses: actions/setup-node@8c91899e586c5b171469028077307d293428b516 #v3.4.1
+        with:
+          node-version: "${{ inputs.node_version }}"
+          registry-url: "${{ inputs.registry_url }}"
+          scope: "${{ inputs.scope }}"
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@cd2af74528f644555073f1e24557b269d7e03a8d #v2
+        id: pnpm-install
+        with:
+          version: ${{ inputs.pnpm_version }}
+          run_install: false
+
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+
+      - name: Setup pnpm cache
+        uses: actions/cache@9b0c1fce7a93df8e3bb8926b0d6e9d89e92f20a7 #v3.0.11
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: "Install dependencies"
+        run: pnpm install
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
+
+      - name: "Check eslint & test"
+        if: github.event_name = 'pull_request'
+        run: |
+          pnpm run lint
+          pnpm run build
+          pnpm run test
+
+      - name: Create Release Pull Request
+        if: github.event_name = 'push'
+        id: changesets
+        uses: changesets/action@2a025e8ab1cfa4312c2868cb6aa3cd3b473b84bf #v1.3.0
+        with:
+          publish: pnpm run release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create Release Tag
+        if: github.event_name = 'push' && steps.changesets.outputs.published == 'true'
+        run: pnpm run release:tag
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
