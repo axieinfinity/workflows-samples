@@ -80,14 +80,14 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
 
       - name: "Check eslint & test"
-        if: github.event_name = 'pull_request'
+        if: github.event_name == 'pull_request'
         run: |
           pnpm run lint
           pnpm run build
           pnpm run test
 
       - name: Create Release Pull Request
-        if: github.event_name = 'push'
+        if: github.event_name == 'push'
         id: changesets
         uses: changesets/action@2a025e8ab1cfa4312c2868cb6aa3cd3b473b84bf #v1.3.0
         with:
@@ -98,7 +98,7 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Create Release Tag
-        if: github.event_name = 'push' && steps.changesets.outputs.published == 'true'
+        if: github.event_name == 'push' && steps.changesets.outputs.published == 'true'
         run: pnpm run release:tag
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
