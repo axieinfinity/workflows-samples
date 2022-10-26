@@ -18,6 +18,10 @@ on:
         required: false
         type: string
         default: '.'
+      docker_push:
+        required: false
+        type: boolean
+        default: true
 
 jobs:
   build:
@@ -59,6 +63,7 @@ jobs:
 
       - id: 'auth'
         name: 'Authenticate to Google Cloud'
+        if: ${{ inputs.docker_push }}
         uses: 'google-github-actions/auth@c4799db9111fba4461e9f9da8732e5057b394f72' #v0.8.3
         with:
           token_format: 'access_token'
@@ -66,6 +71,7 @@ jobs:
           service_account: ${{ secrets.GH_ACTIONS_SA_GCR }}
 
       - name: 'Login to GCR'
+        if: ${{ inputs.docker_push }}
         uses: 'docker/login-action@f4ef78c080cd8ba55a85445d5b36e214a81df20a' #v2.1.0
         with:
           registry: gcr.io
@@ -77,7 +83,7 @@ jobs:
         with:
           context: ${{ inputs.build_context }}
           file: ${{ inputs.dockerfile_path }}
-          push: true
+          push: ${{ inputs.docker_push }}
           tags: ${{ steps.meta.outputs.tags }}
           secrets: |
             "github_token=${{ steps.gh-app.outputs.token }}"
