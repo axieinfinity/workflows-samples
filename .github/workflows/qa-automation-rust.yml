@@ -1,0 +1,136 @@
+on:
+  workflow_call:
+    inputs:
+      rust_profile:
+        description: 'Execute rustup set profile {value} before installing the toolchain, ex. minimal'
+        required: false
+        type: string
+        default: 'minimal'
+      rust_toolchain:
+        description: 'Toolchain name to use, ex. stable, nightly.'
+        required: false
+        type: string
+        default: 'stable'
+      rust_components:
+        description: 'Comma-separated list of the additional components to install, ex. clippy, rustfmt.'
+        required: false
+        type: string
+      checkout_repository:
+        description: 'Repository name with owner.'
+        required: false
+        type: string
+      sql_file:
+        description: 'Path to file sql.'
+        required: false
+        type: string
+      postgres_image:
+        description: 'Postgres Image'
+        default: 'postgres:14'
+        required: false
+        type: string
+      postgres_user:
+        description: 'Postgres Username'
+        default: 'postgres'
+        required: false
+        type: string
+      postgres_pass:
+        description: 'Postgres Password'
+        default: '123'
+        required: false
+        type: string
+      postgres_db:
+        description: 'Postgres DB'
+        default: 'test'
+        required: false
+        type: string
+      python_version:
+        description: 'The python-version input supports the Semantic Versioning Specification'
+        required: false
+        type: string
+        default: '3.9'
+
+jobs:
+  report:
+
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: ${{ inputs.postgres_image }}
+        ports:
+        - 5432:5432
+        env:
+          POSTGRES_USER: '${{ inputs.postgres_user }}'
+          POSTGRES_PASSWORD: '${{ inputs.postgres_pass }}'
+          POSTGRES_DB: '${{ inputs.postgres_db }}'
+
+    steps:
+      - id: 'gh-app'
+        name: 'Get Token'
+        uses: 'tibdex/github-app-token@021a2405c7f990db57f5eae5397423dcc554159c' #v1.7.0
+        with:
+          app_id: ${{ secrets.GH_APP_ID }}
+          private_key: ${{ secrets.GH_PRIVATE_KEY }}
+
+      - name: 'Checkout Repo'
+        uses: 'actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8' #v3.1.0
+        with:
+          repository: ${{ inputs.checkout_repository }}
+          token: ${{ steps.gh-app.outputs.token }}
+
+      - name: 'Cache Cargo'
+        uses: 'actions/cache@9b0c1fce7a93df8e3bb8926b0d6e9d89e92f20a7' #v3.0.11
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: 'Setup Rust'
+        uses: 'actions-rs/toolchain@b2417cde72dcf67f306c0ae8e0828a81bf0b189f' #v1.0.7
+        with:
+          profile: '${{ inputs.rust_profile }}'
+          toolchain: '${{ inputs.rust_toolchain }}'
+          components: '${{ inputs.rust_components }}'
+
+      - name: 'Git Config'
+        run: |
+          git config --global url."https://x-access-token:${{ steps.gh-app.outputs.token }}@github.com".insteadOf "ssh://git@github.com"
+
+      - name: 'Rust Build'
+        run: cargo install junitify || true && cargo build
+
+      - name: 'Import DB'
+        run: psql -h localhost -U ${{ inputs.postgres_user }} -d ${{ inputs.postgres_db }} < ${{ inputs.sql_file }}
+        env:
+          PGPASSWORD: ${{ inputs.postgres_pass }}
+
+      - name: 'Cargo Test'
+        run: cargo test -- --format=json -Z unstable-options --report-time | junitify -o ./report/
+        continue-on-error: true
+        env:
+          ABILITY_DATABASE_URL: postgres://${{ inputs.postgres_user }}:${{ inputs.postgres_pass }}@localhost:5432/${{ inputs.postgres_db }}
+
+      - name: 'Setup Python'
+        uses: 'actions/setup-python@13ae5bb136fac2878aff31522b9efb785519f984' #v4.3.0
+        with:
+          python-version: '${{ inputs.python_version }}'
+
+      - name: 'Install junit2html'
+        run: pip install junit2html
+
+      - name: 'Convert xml to html'
+        run: junit2html ./report/test-0.xml ./report/intergration-test-report.html
+
+      - name: Tar files
+        run: tar -cvf report-${{ inputs.environment }}.tar report
+
+      - name: 'Upload Artifact'
+        uses: 'actions/upload-artifact@83fd05a356d7e2593de66fc9913b3002723633cb' #v3.1.0
+        with:
+          name: report-${{ inputs.environment }}
+          path: report-${{ inputs.environment }}.tar
+          retention-days: 10
