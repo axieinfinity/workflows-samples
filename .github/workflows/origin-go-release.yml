@@ -15,7 +15,7 @@ on:
         type: string
       working_directory:
         description: 'directory path'
-        required: true
+        required: false
         type: string
         default: "."
 
