@@ -13,6 +13,10 @@ on:
         description: 'Testing the packages named by the paths.'
         required: false
         type: string
+      go_test_directory:
+        description: 'Testing the packages named by the paths.'
+        required: false
+        type: string
       golint_version:
         description: 'The version of golangci-lint to use in form of v1.2 or v1.2.3 or `latest` to use the latest version'
         required: false
@@ -49,3 +53,4 @@ jobs:
 
       - name: 'Test with the Go CLI'
         run: go test '${{ inputs.test_flags }}' '${{ inputs.go_path }}'
+        working-directory: '${{ inputs.go_test_directory }}'
