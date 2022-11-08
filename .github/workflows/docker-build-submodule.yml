@@ -22,6 +22,10 @@ on:
         required: false
         type: boolean
         default: true
+      docker_build_args:
+        required: false
+        type: string
+        default: ""
 
 jobs:
   build:
@@ -85,5 +89,6 @@ jobs:
           file: ${{ inputs.dockerfile_path }}
           push: ${{ inputs.docker_push }}
           tags: ${{ steps.meta.outputs.tags }}
+          build-args: ${{ inputs.docker_build_args }}
           secrets: |
             "github_token=${{ steps.gh-app.outputs.token }}"
