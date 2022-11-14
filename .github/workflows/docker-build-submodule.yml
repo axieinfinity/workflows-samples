@@ -49,6 +49,8 @@ jobs:
       - id: 'meta'
         name: 'Docker Meta'
         uses: 'docker/metadata-action@57396166ad8aefe6098280995947635806a0e6ea' #v4.1.1
+        env:
+          DOCKER_METADATA_PR_HEAD_SHA: true
         with:
           images: ${{ inputs.image_repository }}
           tags: |
