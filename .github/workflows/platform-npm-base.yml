@@ -40,7 +40,7 @@ jobs:
         with:
           version: ${{ inputs.pnpm_version }}
 
-      - name: 'Setup Bun runtime'
+      - name: "Setup Bun runtime"
         uses: antongolub/action-setup-bun@fe3087e075d89bcc411b5e20b95aacbdac8acef4 #v1.12
         with:
           bun-version: ${{ inputs.bun_version }}
@@ -75,7 +75,7 @@ jobs:
             ${{ runner.os }}-pnpm-store-
 
       - name: "Install dependencies"
-        run: pnpm install
+        run: pnpm install --no-frozen-lockfile
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
 
