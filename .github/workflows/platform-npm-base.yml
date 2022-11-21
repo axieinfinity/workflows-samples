@@ -28,10 +28,10 @@ on:
         description: "Optional scope for authenticating against scoped registries."
         required: false
         type: string
+
 jobs:
   npm:
     runs-on: ubuntu-latest
-
     steps:
       - name: "Checkout Repo"
         uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 #v3.0.2
@@ -40,12 +40,13 @@ jobs:
         with:
           version: ${{ inputs.pnpm_version }}
 
-      - uses: xhyrom/setup-bun@0ec953ee6d7a21c8bcefd4afe696a83930d8bb63 #0.1.7
+      - name: 'Setup Bun runtime'
+        uses: antongolub/action-setup-bun@fe3087e075d89bcc411b5e20b95aacbdac8acef4 #v1.12
         with:
           bun-version: ${{ inputs.bun_version }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: "Setup Node"
+      - name: "Setup Node runtime"
         uses: actions/setup-node@8c91899e586c5b171469028077307d293428b516 #v3.4.1
         with:
           node-version: "${{ inputs.node_version }}"
@@ -78,11 +79,26 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
 
-      - name: "Check eslint"
-        run: pnpm run lint
+      - name: "Check eslint & test"
+        if: github.event_name == 'pull_request'
+        run: |
+          pnpm run lint
+          pnpm run build
+          pnpm run test
 
-      - name: "Build Packages"
-        run: pnpm run build
+      - name: Create Release Pull Request
+        if: github.event_name == 'push'
+        id: changesets
+        uses: changesets/action@2a025e8ab1cfa4312c2868cb6aa3cd3b473b84bf #v1.3.0
+        with:
+          publish: pnpm run release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: "Run unittest"
-        run: pnpm run test
+      - name: Create Release Tag
+        if: github.event_name == 'push' && steps.changesets.outputs.published == 'true'
+        run: pnpm run release:tag
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

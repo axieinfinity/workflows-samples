@@ -1,0 +1,31 @@
+on:
+  workflow_call:
+    inputs:
+      toolchain_version:
+        description: 'The Rust toolchain version (ex: stable, nightly, 1.65, etc)'
+        required: false
+        type: string
+        default: 'stable'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - id: 'gh-app'
+      name: 'Get Token'
+      uses: 'tibdex/github-app-token@021a2405c7f990db57f5eae5397423dcc554159c' #v1.7.0
+      with:
+        app_id: ${{ secrets.GH_APP_ID }}
+        private_key: ${{ secrets.GH_PRIVATE_KEY }}
+    - name: 'Checkout repo'
+      uses: 'actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8' #v3.1.0
+    - name: 'Setup creds'
+      run: |
+        git config --global url."https://x-access-token:${{ steps.gh-app.outputs.token }}@github.com".insteadOf "ssh://git@github.com"
+    - name: 'Install Rust toolchains (rustfmt, and clippy)'
+      uses: 'dtolnay/rust-toolchain@55c7845fad90d0ae8b2e83715cb900e5e861e8cb'
+      with:
+        profile: minimal
+        toolchain: ${{ inputs.toolchain_version }}
+    - name: 'Run tests'
+      run: cargo test --all-targets --all-features --verbose -- --nocapture
