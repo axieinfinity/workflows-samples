@@ -16,10 +16,23 @@ on:
         required: false
         type: boolean
         default: false
+      redis_image:
+        description: 'Redis Image'
+        default: 'redis'
+        required: false
+        type: string
+    
 
 jobs:
-  lint-and-test:
+  lint-and-unittest:
     runs-on: ubuntu-latest
+
+    services:
+      redis:
+        image: ${{ inputs.redis_image }}
+        ports:
+        - 6379:6379
+
     steps:
       - id: 'gh-app'
         name: 'Get Token'
@@ -56,3 +69,5 @@ jobs:
       - name: 'Run rust test'
         if: ${{ inputs.unittest != false }}
         run: cargo test
+        env:
+          REDIS_URL: redis://127.0.0.1:6379
