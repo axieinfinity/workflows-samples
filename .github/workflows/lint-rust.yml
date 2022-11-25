@@ -6,6 +6,12 @@ on:
         required: false
         type: string
         default: 'nightly'
+      checkout_repository:
+        required: false
+        type: string
+      checkout_submodules:
+        required: false
+        type: string
 
 jobs:
   lint:
