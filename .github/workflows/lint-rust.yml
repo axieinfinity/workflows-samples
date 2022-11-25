@@ -14,7 +14,7 @@ on:
         type: string
 
 jobs:
-  lint:
+  lint-and-test:
     runs-on: ubuntu-latest
     steps:
       - id: 'gh-app'
@@ -48,3 +48,7 @@ jobs:
 
       - name: 'Run clippy'
         run: cargo clippy --all-features -- -D warnings
+
+      - name: 'Run rust test'
+        if: ${{ env.UNITTEST == 'true' }}
+        run: cargo test
