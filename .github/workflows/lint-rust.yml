@@ -44,7 +44,7 @@ jobs:
           override: true
 
       - name: 'Run Rust fmt'
-        actions/checkoutrun: cargo fmt --all -- --check
+        run: cargo fmt --all -- --check
 
       - name: 'Run clippy'
         run: cargo clippy --all-features -- -D warnings
