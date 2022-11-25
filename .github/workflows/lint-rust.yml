@@ -12,6 +12,10 @@ on:
       checkout_submodules:
         required: false
         type: string
+      unittest:
+        required: false
+        type: boolean
+        default: false
 
 jobs:
   lint-and-test:
@@ -50,5 +54,5 @@ jobs:
         run: cargo clippy --all-features -- -D warnings
 
       - name: 'Run rust test'
-        if: ${{ env.UNITTEST == 'true' }}
+        if: ${{ inputs.unittest != false }}
         run: cargo test
