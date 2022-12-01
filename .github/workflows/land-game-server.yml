@@ -119,7 +119,7 @@ jobs:
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
 
       - name: 'Setup Rust'
-        uses: 'dtolnay/rust-toolchain@55c7845fad90d0ae8b2e83715cb900e5e861e8cb'
+        uses: 'dtolnay/rust-toolchain@e645b0cf01249a964ec099494d38d2da0f0b349f'
         with:
           profile: '${{ inputs.rust_profile }}'
           toolchain: '${{ inputs.rust_toolchain }}'
