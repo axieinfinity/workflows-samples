@@ -19,10 +19,18 @@ on:
         description: 'usage: mvn [options] [<goal(s)>] [<phase(s)>]'
         required: false
         type: string
+      timeout_minutes:
+        description: 'The maximum number of minutes to run the step before killing the processi.'
+        required: false
+        type: string
+        default: '60'
 
 jobs:
   java:
+
     runs-on: ubuntu-latest
+    timeout-minutes: ${{ inputs.timeout_minutes }}
+
     steps:
       - id: 'gh-app'
         name: 'Get Token'
