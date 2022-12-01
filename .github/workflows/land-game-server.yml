@@ -167,7 +167,7 @@ jobs:
         uses: 'dawidd6/action-ansible-playbook@5d970176ea4bfd99a3f5004d48e293fe0994eda1' #v2.6.1
         env:
           CLOUDSDK_PYTHON_SITEPACKAGES: 1
-          ANSIBLE_REMOTE_TEMP: "~/.ansible/tmp"
+          ANSIBLE_REMOTE_TEMP: "/tmp"
         with:
           playbook: ${{ inputs.ansible_playbook }}
           requirements: requirements.yml
