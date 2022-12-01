@@ -127,7 +127,7 @@ jobs:
 
       - name: 'Git Config'
         run: |
-          git config --global url."https://x-access-token:${{ steps.gh-app.outputs.token }}@github.com".insteadOf "https://github.com"
+          git config --global url."https://x-access-token:${{ steps.gh-app.outputs.token }}@github.com".insteadOf "ssh://github.com"
 
       - name: 'Rust Build'
         run: cargo build --release ${{ inputs.build_options }}
