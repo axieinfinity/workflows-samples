@@ -23,7 +23,7 @@ jobs:
       run: |
         git config --global url."https://x-access-token:${{ steps.gh-app.outputs.token }}@github.com".insteadOf "ssh://git@github.com"
     - name: 'Install Rust toolchains (rustfmt, and clippy)'
-      uses: 'dtolnay/rust-toolchain@55c7845fad90d0ae8b2e83715cb900e5e861e8cb'
+      uses: 'dtolnay/rust-toolchain@e645b0cf01249a964ec099494d38d2da0f0b349f'
       with:
         profile: minimal
         toolchain: ${{ inputs.toolchain_version }}
