@@ -60,6 +60,9 @@ jobs:
           components: rustfmt, clippy
           override: true
 
+      - name: 'Install pkg-config'
+        run: apt install pkg-config -y
+
       - name: 'Run Rust fmt'
         run: cargo fmt --all -- --check
 
