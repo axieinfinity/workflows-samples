@@ -25,7 +25,7 @@ on:
 
 jobs:
   build:
-    runs-on: [self-hosted, dockerize]
+    runs-on: [self-hosted, ubuntu-latest]
 
     permissions:
       contents: 'read'

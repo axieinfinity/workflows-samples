@@ -8,7 +8,7 @@ on:
 
 jobs:
   semgrep:
-    runs-on: [self-hosted, gke]
+    runs-on: [self-hosted, ubuntu-latest]
 
     container:
       # A Docker image with Semgrep installed. Do not change this.
