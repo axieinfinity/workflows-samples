@@ -9,7 +9,7 @@ on:
 
 jobs:
   nodejs:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, gke]
     steps:
       - name: 'Checkout Repo'
         uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 #v3.0.2
@@ -19,11 +19,17 @@ jobs:
         with:
           node-version: '${{ inputs.node_version }}'
 
-      - name: 'Install Libaries'
-        run: yarn install
+      - name: 'Run install'
+        uses: borales/actions-yarn@97ba8bebfe5b549bb7999261698a52a81fd62f1b #v4.2.0
+        with:
+          cmd: install
 
-      - name: 'Compile'
-        run: yarn compile
+      - name: 'Run Compile'
+        uses: borales/actions-yarn@97ba8bebfe5b549bb7999261698a52a81fd62f1b #v4.2.0
+        with:
+          cmd: compile
 
       - name: 'Run Test'
-        run: yarn test
+        uses: borales/actions-yarn@97ba8bebfe5b549bb7999261698a52a81fd62f1b #v4.2.0
+        with:
+          cmd: test
