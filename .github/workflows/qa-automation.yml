@@ -6,6 +6,11 @@ on:
         required: false
         type: string
         default: '18'
+      maven_version:
+        description: 'The Maven version to set up.'
+        required: false
+        type: string
+        default: '3.8.6'
       checkout_repository:
         description: 'Repository name with owner.'
         required: false
@@ -58,6 +63,11 @@ jobs:
         with:
           distribution: '${{ inputs.java_distribution }}'
           java-version: '${{ inputs.java_version }}'
+
+      - name: 'Set up Maven'
+        uses: stCarolas/setup-maven@07fbbe97d97ef44336b7382563d66743297e442f #v4.5
+        with:
+          maven-version: '${{ inputs.maven_version }}'
 
       - name: 'Build with Maven'
         run: mvn clean verify ${{ inputs.mvn_options }} -Denvironment=${{ inputs.environment }}
