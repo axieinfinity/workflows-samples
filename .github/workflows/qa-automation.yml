@@ -28,7 +28,7 @@ on:
 jobs:
   java:
 
-    runs-on: [self-hosted, ubuntu-latest]
+    runs-on: [self-hosted, gke]
     timeout-minutes: ${{ inputs.timeout_minutes }}
 
     steps:
