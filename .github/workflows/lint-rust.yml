@@ -61,7 +61,9 @@ jobs:
           override: true
 
       - name: 'Install pkg-config'
-        run: apt install pkg-config -y
+        run: |
+          sudo apt-get update
+          sudo apt-get install pkg-config
 
       - name: 'Run Rust fmt'
         run: cargo fmt --all -- --check
