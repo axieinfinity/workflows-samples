@@ -8,7 +8,7 @@ on:
 
 jobs:
   semgrep:
-    runs-on: [ubuntu-latest]
+    runs-on: [self-hosted, gke]
 
     container:
       # A Docker image with Semgrep installed. Do not change this.
@@ -26,7 +26,7 @@ jobs:
         run: semgrep ci ${{ inputs.semgrep_options }}
 
   TruffleHog:
-    runs-on: [ubuntu-latest]
+    runs-on: [self-hosted, gke]
 
     steps:
       - name: 'Checkout Repo'
