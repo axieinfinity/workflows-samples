@@ -1,0 +1,38 @@
+on:
+  workflow_call:
+    inputs:
+      node_version:
+        description: 'The Node version to download (if necessary) and use.'
+        required: false
+        type: string
+        default: 'latest'
+      node_options:
+        description: 'node options'
+        required: false
+        type: string
+      node_script:
+        description: 'Script to execute'
+        required: false
+        type: string
+      node_arguments:
+        description: 'node arguments'
+        required: false
+        type: string
+
+jobs:
+  nodejs:
+    runs-on: [self-hosted, gke]
+    steps:
+      - name: 'Checkout Repo'
+        uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 #v3.0.2
+
+      - name: 'Setup Node'
+        uses: actions/setup-node@8c91899e586c5b171469028077307d293428b516 #v3.4.1
+        with:
+          node-version: '${{ inputs.node_version }}'
+
+      - name: 'Install dependencies'
+        run: npm install
+
+      - name: 'Run with Node'
+        run: node ${{ inputs.node_options }} ${{ inputs.node_script }} ${{ inputs.node_arguments }}
