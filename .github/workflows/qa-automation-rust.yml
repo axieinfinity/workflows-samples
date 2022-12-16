@@ -52,7 +52,7 @@ on:
 jobs:
   report:
 
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, gke]
 
     services:
       postgres:
@@ -103,7 +103,12 @@ jobs:
       - name: 'Rust Build'
         run: cargo install junitify || true && cargo build
 
-      - name: 'Import DB'
+      - name: 'Install PostgreSQL client'
+        run: |
+          apt-get update
+          apt-get install --yes postgresql-client
+
+      - name: 'Import DB seed data'
         run: psql -h localhost -U ${{ inputs.postgres_user }} -d ${{ inputs.postgres_db }} < ${{ inputs.sql_file }}
         env:
           PGPASSWORD: ${{ inputs.postgres_pass }}
