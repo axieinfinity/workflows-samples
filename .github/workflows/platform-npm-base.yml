@@ -41,7 +41,7 @@ jobs:
           version: ${{ inputs.pnpm_version }}
 
       - name: "Setup Bun runtime"
-        uses: antongolub/action-setup-bun@fdcfbf4a6819c0e33d448b11fba441d0d6a2fbcc #v1.12
+        uses: antongolub/action-setup-bun@9abbb07e94d8e4b36ec6e7ed5dbfbc78c6db81e4 #v1.12
         with:
           bun-version: ${{ inputs.bun_version }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
