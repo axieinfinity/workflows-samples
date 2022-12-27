@@ -74,11 +74,10 @@ jobs:
           workload_identity_provider: ${{ secrets.GH_ACTIONS_WIP }}
           service_account: ${{ secrets.GH_ACTIONS_SA_GCR }}
 
-      - name: 'Login to GCR'
-        if: ${{ inputs.docker_push }}
+      - name: 'Login to GAR'
         uses: 'docker/login-action@f4ef78c080cd8ba55a85445d5b36e214a81df20a' #v2.1.0
         with:
-          registry: gcr.io
+          registry: us-docker.pkg.dev
           username: oauth2accesstoken
           password: ${{ steps.auth.outputs.access_token }}
 
