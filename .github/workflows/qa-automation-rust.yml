@@ -120,7 +120,7 @@ jobs:
           ABILITY_DATABASE_URL: postgres://${{ inputs.postgres_user }}:${{ inputs.postgres_pass }}@localhost:5432/${{ inputs.postgres_db }}
 
       - name: 'Setup Python'
-        uses: 'actions/setup-python@2c3dd9e7e29afd70cc0950079bde6c979d1f69f9' #v4.3.0
+        uses: 'actions/setup-python@5ccb29d8773c3f3f653e1705f474dfaa8a06a912' #v4.3.0
         with:
           python-version: '${{ inputs.python_version }}'
 
