@@ -181,3 +181,6 @@ jobs:
           sudo: true
           options: |
             ${{ inputs.ansible_options }}
+
+      - name: 'Remove SSH Profile'
+        run: 'for i in $(gcloud compute os-login ssh-keys list | grep -v FINGERPRINT); do echo $i; gcloud compute os-login ssh-keys remove --key $i; done'
