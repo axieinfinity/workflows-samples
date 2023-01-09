@@ -18,7 +18,7 @@ jobs:
         app_id: ${{ secrets.GH_APP_ID }}
         private_key: ${{ secrets.GH_PRIVATE_KEY }}
     - name: 'Checkout repo'
-      uses: 'actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b' #v3.1.0
+      uses: 'actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c' #v3.1.0
     - name: 'Setup creds'
       run: |
         git config --global url."https://x-access-token:${{ steps.gh-app.outputs.token }}@github.com".insteadOf "ssh://git@github.com"
